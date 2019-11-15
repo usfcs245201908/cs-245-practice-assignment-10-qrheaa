@@ -1,62 +1,74 @@
-public class GraphImplementation {
-	private LinkedList[] list;
-	private LinkedList[] schedule;
+import java.util.*;
+
+public class GraphImplementation implements Graph {
+	private int[][] list;
+	private int vertices;
 
 	public GraphImplementation(int vertices) {
-		list = new LinkedList[vertices];
-		for(int i = 0; i < vertices; i++) {
-			list[i] = new LinkedList(); //make new linked list for each vertix
-		}
+		list = new int[vertices][vertices];
+		this.vertices = vertices;
 	}
 
-	void add_edge(int v1, int v2) {
-		if(v1 > list.length || v2 >= list.length) {
-			System.out.println("Out of bounds.");
+	public void addEdge(int v1, int v2) throws Exception{
+		if(v1 > vertices || v2 >= vertices || v1 < 0 || v2 < 0) {
+			throw new Exception("Out of Bounds.");
 		}
-		if(v1 < 0 || v2 < 0) {
-			System.out.println("Out of bounds.");
-		}
-		list[v1].add(v2);
+		list[v1][v2] = 1; //add a 1 in list;
 	}
 
 
-
-	List<Integer> topologicalSort() {
-		ArrayList<Integer> schedule = new ArrayList<Integer>;
+	public List<Integer> topologicalSort() {
+		List<Integer> schedule = new ArrayList<Integer>();
 
 		int[] sum = new int[vertices];
+
 
 		//iterate through columns and rows
 		for(int i = 0; i < vertices; i++) {
 			for(int j = 0; j < vertices; j++)
-				sum[i] += matrix[i][j];
+				sum[j] += list[i][j];
 		}
 
-		sum[n] = -1;
-
 		for(int count = 0; count < vertices; count++) {
-			schedule.add(n); // put in 
 
 			int n = findZero(sum); //***have to write findZero function; finding out at which index its 0
+			if(n == -1) {
+				System.out.println("Incorrect.");
+			}
 
+			schedule.add(n); // put in 
+			sum[n] = -1;
 			for(int i = 0; i < vertices; i++)
-				sum[i] -= matrix[n][i];
+				sum[i] -= list[n][i];
 		}
 
 		return schedule;
 	}
 
-	List<Integer> neighbors(int vertex) {
+	public List<Integer> neighbors(int vertex) throws Exception{
 		//Prints (to console) one ordering of vertices such that each directed edge (v1, v2) from vertex v1 to vertex v2, v1 comes before v2 in the ordering. If such an ordering is not possible (due to cycles, for example), this function must indicate so, though it may print a partial solution in so doing.
 
+		if(vertex > vertices || vertex < 0)
+			throw new Exception("Out of Bounds.");
+
 		List<Integer> neighbors = new ArrayList<Integer>();
-		for(i = 0; i < vertex; i++) {
-			neighbors.add_edge(i);
+		for(int i = 0; i < vertices; i++) {
+			if(list[vertex][i] == 1) {
+				neighbors.add(i);
+			}
 		}
 
 		return neighbors;
 
-
-
 	}
+
+	private int findZero(int[] arr) {
+		for(int i = 0; i < arr.length; i++) {
+			if(arr[i] == 0)
+				return i;
+		}
+		return -1;
 }
+}
+
+//time complexity: O(v^2 * |E| )
